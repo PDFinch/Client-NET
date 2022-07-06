@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "PDFinch.TestClient.NET50": {
+      "commandName": "Project",
+      "commandLineArgs": "--di"
+    }
+  }
+}

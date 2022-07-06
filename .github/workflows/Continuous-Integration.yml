@@ -1,0 +1,47 @@
+name: Continuous Integration
+
+on: 
+  push:
+    branches:
+      - '**'
+    # Don't trigger CI for a tag, the commit will trigger it already.
+    tags-ignore:
+      - '*.*'
+
+env:
+  # Disable sending usage data to Microsoft
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+  DOTNETVERSION: "6.0.x"
+
+jobs:
+  Build_and_Test:
+    name: Continuous Integration
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v2
+      
+      - name: Setup NuGet Cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
+      
+      - name: Setup .NET Core SDK ${{ env.DOTNETVERSION }}
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: ${{ env.DOTNETVERSION }}
+      
+      # Those projects are only needed at development time and NET48 can't build on Linux.
+      - name: Remove development project from solution
+        run: dotnet sln PDFinch.Client.sln remove TestClients/PDFinch.TestClient.NET48 TestClients/PDFinch.TestClient.NET50 TestClients/PDFinch.TestClient.Shared 
+
+      - name: Restore
+        run: dotnet restore
+      
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+      
+      - name: Test
+        run: dotnet test -c Release --no-restore --no-build

@@ -1,0 +1,43 @@
+<!-- Shared properties for all projects in this directory (src) -->
+<Project>
+	<PropertyGroup>
+		<!-- Set through /p:Version= on console, or using the appropriate action parameter -->
+		<Version>1.0.0-dev</Version>
+		<Deterministic>true</Deterministic>
+		<LangVersion>latest</LangVersion>
+		<Nullable>enable</Nullable>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+	</PropertyGroup>
+
+	<!-- Package Metadata - overriding in csproj is replacing these for that project -->
+	<PropertyGroup>
+		<Authors>PDFinch.com</Authors>
+		<Company>PDFinch.com</Company>
+		<PackageTags>pdf pdfinch</PackageTags>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+	</PropertyGroup>
+
+	<!-- All these are required for proper Source Link in the package to work -->
+	<PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+		<!-- Publish the repository URL in the built .nupkg (in the NuSpec <Repository> element) -->
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+
+		<!-- Embed source files that are not tracked by the source control manager in the PDB (generated files, but we have none) -->
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+
+		<!-- Embed symbols containing Source Link in the main file (exe/dll) -->
+		<!-- TODO: but then no symbols, hence empty snupkgs and larger assemblies -->
+		<!--<DebugType>embedded</DebugType>-->
+
+		<!-- Relative paths in PDBs -->
+		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<!-- Update here, not through the NuGet Package Manager, that updates it in individual .csproj files. -->
+		<!-- Also note the PrivateAssets="All", meaning it doesn't get included in the package as a reference -->
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All"/>
+	</ItemGroup>
+</Project>

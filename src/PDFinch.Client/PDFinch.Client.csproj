@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+
+		<Description>Basic .NET client for the PDFinch.com APIs</Description>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\PDFinch.Client.Common\PDFinch.Client.Common.csproj" />
+	</ItemGroup>
+
+</Project>
+

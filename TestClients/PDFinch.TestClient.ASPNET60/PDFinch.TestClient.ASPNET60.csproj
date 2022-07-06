@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+	</PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\appsettings.json" Link="appsettings.json" />
+  </ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\..\src\PDFinch.Client.Common\PDFinch.Client.Common.csproj" />
+	  <ProjectReference Include="..\..\src\PDFinch.Client.Extensions\PDFinch.Client.Extensions.csproj" />
+	</ItemGroup>
+</Project>
