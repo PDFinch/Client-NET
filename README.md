@@ -5,7 +5,7 @@ This repository contains the C# source code for the .NET clients to the PDFinch 
 
 You need to have an account with enough credits and an active set of API keys. You can [register an account or log in here](https://www.pdfinch.com/account/login).
 # Basic usage
-Our API currently supports one thing: generating PDFs from HTML. You can do so by calling `IPdfClient.GeneratePdfFromHtmlAsync()`:
+Our API currently supports one thing: generating PDFs from HTML, with some variations. The most simple way is available by calling `IPdfClient.GeneratePdfFromHtmlAsync()`:
 
 ```C#
 IPdfClient pdfClient = ... // see chapter "Obtaining an IPdfClient" below
@@ -31,8 +31,29 @@ else
     throw new InvalidOperationException($"Error generating PDF: {pdfResult.StatusMessage}");
 }
 ```
+
+You can also merge multiple blocks of HTML:
+
+```C#
+PdfResult<Stream> pdfResult = await pdfClient.GenerateMergedPdfFromHtmlAsync(new []
+{ 
+    new PdfRequest("<h1>Your-Html-String</h1>")
+    {
+        MarginBottom = 10,
+        MarginTop = 10,
+        MarginLeft = 10,
+        MarginRight = 10,
+        Landscape = false,
+        GrayScale = false,
+    }, new PdfRequest("<h1>Your-Second-Html</h1>")
+    {
+        Landscape = true,
+    },
+});
+```
+
 # Handling responses
-`PDFinch.Client.Common.IPdfClient.GeneratePdfFromHtmlAsync()` returns a `Task<PdfResult<Stream>>`. This means the call should be `await`ed, and the return value must be checked for success.
+The `PDFinch.Client.Common.IPdfClient.Generate...Async()` methods return a `Task<PdfResult<Stream>>`. This means the call should be `await`ed, and the return value must be checked for success.
 
 If `PdfResult<Stream>.Success` is `false`, `.Data` will be `null` and `.StatusMessage` will contain a machine-readable (JSON) error message returned by the API.
 
