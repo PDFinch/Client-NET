@@ -7,7 +7,7 @@ using PDFinch.Client.Tests.Shared;
 
 namespace PDFinch.Client.Common.Tests
 {
-    public class HttpClientExtensionTests
+    public class HttpClientTokenTests
     {
         [Test]
         public async Task GetTokenAsync_Parses_Json()

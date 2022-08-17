@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Http;
@@ -33,35 +34,56 @@ namespace PDFinch.Client.Common
         protected abstract Task<HttpClient> AuthenticateClientAsync(HttpRequestMessage httpRequestMessage);
 
         /// <inheritdoc/>
+        public Task<PdfResult<Stream>> GeneratePdfFromHtmlAsync(PdfRequest pdfRequest) => GeneratePdfFromHtmlAsync(pdfRequest.Html, pdfRequest);
+
+        /// <inheritdoc/>
         public async Task<PdfResult<Stream>> GeneratePdfFromHtmlAsync(string html, PdfOptions? options = null)
         {
-            HttpRequestMessage httpRequestMessage = new(HttpMethod.Post, Resources.CreatePdfEndpoint + options?.ToQueryString());
-            
-            httpRequestMessage.Content = new StringContent(html, Encoding.UTF8, "text/html");
-
-            HttpClient? autenticatedHttpClient;
-
-            try
+            HttpRequestMessage httpRequestMessage = new(HttpMethod.Post, Resources.CreatePdfEndpoint + options?.ToQueryString())
             {
-                autenticatedHttpClient = await AuthenticateClientAsync(httpRequestMessage);
-            }
-            catch (Exception ex)
-            {
-                return new PdfResult<Stream>(otherError: true, statusMessage: GetExceptionJson(ex));
-            }
+                Content = new StringContent(html, Encoding.UTF8, "text/html")
+            };
 
-            // ReSharper disable once ConstantConditionalAccessQualifier - implementor can return null.
-            if (autenticatedHttpClient?.BaseAddress == null)
+            return await ExecuteRequestAsync(httpRequestMessage);
+        }
+
+        /// <inheritdoc/>
+        public async Task<PdfResult<Stream>> GenerateMergedPdfFromHtmlAsync(IEnumerable<PdfRequest> pdfRequests)
+        {
+            var formContent = new MultipartFormDataContent();
+
+            var i = 0;
+
+            foreach (var request in pdfRequests)
             {
-                const string errorMessage = $"{nameof(AuthenticateClientAsync)}() must return an {nameof(HttpClient)} with its {nameof(HttpClient.BaseAddress)} set";
+                formContent.Add(new StringContent(request.Html, Encoding.UTF8, "text/html"), $"d[{i}].body");
                 
-                return new PdfResult<Stream>(otherError: true, statusMessage: PdfResult<Stream>.JsonStatus(errorMessage));
+                formContent.Add(new StringContent(request.Landscape.ToString()), $"d[{i}].landscape");
+                formContent.Add(new StringContent(request.GrayScale.ToString()), $"d[{i}].grayscale");
+                formContent.Add(new StringContent(request.MarginLeft.ToString()), $"d[{i}].marginleft");
+                formContent.Add(new StringContent(request.MarginRight.ToString()), $"d[{i}].marginright");
+                formContent.Add(new StringContent(request.MarginTop.ToString()), $"d[{i}].margintop");
+                formContent.Add(new StringContent(request.MarginBottom.ToString()), $"d[{i}].marginbottom");
+
+                i++;
             }
 
+            HttpRequestMessage httpRequestMessage = new(HttpMethod.Post, Resources.MergePdfEndpoint)
+            {
+                Content = formContent
+            };
+
+            return await ExecuteRequestAsync(httpRequestMessage);
+        }
+
+        private async Task<PdfResult<Stream>> ExecuteRequestAsync(HttpRequestMessage httpRequestMessage)
+        {
             try
             {
+                var autenticatedHttpClient = await AuthenticateClientImplAsync(httpRequestMessage);
+
                 var response = await autenticatedHttpClient.SendAsync(httpRequestMessage);
-                
+
                 if (response.IsSuccessStatusCode)
                 {
                     var stream = await response.Content.ReadAsStreamAsync();
@@ -83,6 +105,19 @@ namespace PDFinch.Client.Common
             {
                 return new PdfResult<Stream>(otherError: true, statusMessage: GetExceptionJson(ex));
             }
+        }
+
+        private async Task<HttpClient> AuthenticateClientImplAsync(HttpRequestMessage httpRequestMessage)
+        {
+            var autenticatedHttpClient = await AuthenticateClientAsync(httpRequestMessage);
+
+            // ReSharper disable once ConditionalAccessQualifierIsNonNullableAccordingToAPIContract - implementor can return null.
+            if (autenticatedHttpClient?.BaseAddress == null)
+            {
+                throw new InvalidOperationException($"{nameof(AuthenticateClientAsync)}() must return an {nameof(HttpClient)} with its {nameof(HttpClient.BaseAddress)} set");
+            }
+
+            return autenticatedHttpClient;
         }
 
         private static string GetExceptionJson(Exception ex)

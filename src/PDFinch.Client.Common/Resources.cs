@@ -28,6 +28,11 @@ namespace PDFinch.Client.Common
         public const string CreatePdfEndpoint = "pdf/create";
 
         /// <summary>
+        /// Endpoint for merging multiple HTML requests to a single PDF.
+        /// </summary>
+        public const string MergePdfEndpoint = "pdf/merge";
+
+        /// <summary>
         /// HttpClient name for authentication clients.
         /// </summary>
         // ReSharper disable once InconsistentNaming - ID, not Id.
