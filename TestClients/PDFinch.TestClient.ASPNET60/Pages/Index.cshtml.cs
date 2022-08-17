@@ -18,7 +18,7 @@ namespace PDFinch.TestClient.ASPNET60.Pages
 
         public async Task<IActionResult> OnGet()
         {
-            // TODO: separate page for DI
+            // TODO: separate page for single-client DI
             //// Typed client (IPdfClient in constructor)
             //var pdfResult = await _pdfClient.GeneratePdfFromHtmlAsync($"<h1>Typed IPdfClient</h1><p>Generated on {DateTime.Now:F}.");
             
