@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace PDFinch.Client.Common
@@ -22,5 +23,15 @@ namespace PDFinch.Client.Common
         /// Generate a PDF using the given HTML and options.
         /// </summary>
         Task<PdfResult<Stream>> GeneratePdfFromHtmlAsync(string html, PdfOptions? options = null);
+
+        /// <summary>
+        /// Generate a PDF using the given HTML and options.
+        /// </summary>
+        Task<PdfResult<Stream>> GeneratePdfFromHtmlAsync(PdfRequest pdfRequest);
+        
+        /// <summary>
+        /// Generate a PDF using the given HTML and options.
+        /// </summary>
+        Task<PdfResult<Stream>> GenerateMergedPdfFromHtmlAsync(IEnumerable<PdfRequest> pdfRequests);
     }
 }
