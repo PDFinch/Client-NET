@@ -25,7 +25,7 @@ namespace PDFinch.Client.Tests.Shared
         {
             var handlerReturns = httpHandlerMock.MockResponse((request, cancellationToken) =>
             {
-                if (request.RequestUri!.ToString().EndsWith(Resources.OAuth2Endpoint))
+                if (request.RequestUri?.AbsolutePath == "/" + Resources.OAuth2Endpoint)
                 {
                     // TODO: find ((Request.Content as UrlEncodedFormsContent).Keys) or something in _options, return 401 otherwise.
                     authCallback?.Invoke();
