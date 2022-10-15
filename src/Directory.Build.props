@@ -17,6 +17,7 @@
 		<Company>PDFinch.com</Company>
 		<PackageTags>pdf pdfinch</PackageTags>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageProjectUrl>https://www.pdfinch.com/</PackageProjectUrl>
 	</PropertyGroup>
 
 	<!-- All these are required for proper Source Link in the package to work -->
