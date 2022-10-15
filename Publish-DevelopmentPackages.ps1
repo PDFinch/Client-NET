@@ -17,7 +17,7 @@ if ($Configuration -eq "")
 
 if ($Version -eq "")
 {
-    $Version = "0.9.0-dev01"
+    $Version = "1.1.1-dev01"
 }
 
 Write-Host "Building and packaging libraries, configuration: $Configuration, version: $Version"
